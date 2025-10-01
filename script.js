@@ -12,7 +12,6 @@ const productList = document.getElementById("product-list");
 const cartList = document.getElementById("cart-list");
 const clearCartBtn = document.getElementById("clear-cart-btn");
 
-
 function getCart() {
   return JSON.parse(sessionStorage.getItem("cart")) || [];
 }
@@ -79,22 +78,22 @@ function addToCart(productId) {
   renderCart();       // Update UI
 }
 
+// ----------------- REMOVE FROM CART -----------------
 function removeFromCart(productId) {
-  let cart = getCart(); // get cart from sessionStorage
-  // remove the first occurrence of that product
+  let cart = getCart();
   cart = cart.filter(item => item.id !== productId);
-  saveCart(cart); // save updated cart
-  renderCart();   // update UI
+  saveCart(cart);
+  renderCart();
 }
 
 // ----------------- CLEAR CART -----------------
 function clearCart() {
   sessionStorage.removeItem("cart");
   renderCart();
+}
 
 // ----------------- INITIAL RENDER -----------------
 renderProducts();
 renderCart();
 
-// Clear cart button event
-clearCartBtn.addEventListener("click", clearCart);
+//
