@@ -11,6 +11,8 @@ const products = [
 
 // DOM elements
 const productList = document.getElementById("product-list");
+const cartList = document.getElementById("cart-list");
+const clearCartBtn = document.getElementById("clear-cart-btn");
 
 // Render product list
 function renderProducts() {
@@ -21,18 +23,80 @@ function renderProducts() {
   });
 }
 
+function setupCartButtons() {
+  const addToCartButtons = document.querySelectorAll(".add-to-cart-btn");
+  addToCartButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const productId = parseInt(button.dataset.id);
+      addToCart(productId);
+    });
+  });
+}
+
 // Render cart list
-function renderCart() {}
+function renderCart() {
+	const cart = sessionStorage.getItem("cart");
+	if(!cart) return;
+
+	const cartItems = JSON.parse(cart);
+	cartList.innerHTML = "";
+		
+	cartItems.forEach((item) => {
+		const li = document.createElement("li");
+	    li.textContent = `${item.name} - $${item.price}`;
+
+		const removeBtn = document.createElement("button");
+	    removeBtn.textContent = "Remove";
+
+		removeBtn.addEventListener("click", () => {
+	      removeFromCart(item.id);
+	    });
+
+		li.appendChild(removeBtn);
+		cartList.appendChild(li);
+	})	
+}
+
+
 
 // Add item to cart
-function addToCart(productId) {}
+function addToCart(productId) {
+	const product = products.find((p) => p.id === productId); 
+	if(!product) return;
+
+	const cartItems = sessionStorage.getItem("cart");
+	const cartArray = cartItems ? JSON.parse(cartItems) : [];
+	cartArray.push(product);
+
+	sessionStorage.setItem("cart", JSON.stringify(cartArray));
+	
+	renderCart();
+}
 
 // Remove item from cart
-function removeFromCart(productId) {}
+function removeFromCart(productId) {
+	const cart = sessionStorage.getItem("cart");
+	const items = JSON.parse(cart);
+
+	const index = items.findIndex((item) => item.id === productId);
+	if(index !== -1){
+		items.splice(index, 1);
+		sessionStorage.setItem("cart", JSON.stringify(items));
+	}
+
+	renderCart()
+}
 
 // Clear cart
-function clearCart() {}
+function clearCart() {
+	sessionStorage.removeItem("cart");
+	cartList.innerHTML = "";
+	renderCart();
+}
 
 // Initial render
 renderProducts();
+setupCartButtons();
 renderCart();
+
+clearCartBtn.addEventListener("click", clearCart);
