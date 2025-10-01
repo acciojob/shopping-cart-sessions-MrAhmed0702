@@ -21,6 +21,8 @@ function renderProducts() {
     li.innerHTML = `${product.name} - $${product.price} <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>`;
     productList.appendChild(li);
   });
+
+  setupCartButtons();
 }
 
 function setupCartButtons() {
@@ -96,7 +98,6 @@ function clearCart() {
 
 // Initial render
 renderProducts();
-setupCartButtons();
 renderCart();
 
 clearCartBtn.addEventListener("click", clearCart);
