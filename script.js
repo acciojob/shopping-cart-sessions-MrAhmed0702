@@ -90,9 +90,6 @@ function clearCart() {
 }
 
 // ----------------- INITIAL RENDER -----------------
-// Always reset cart for Cypress tests
-sessionStorage.removeItem("cart");
-
 renderProducts();
 renderCart();
 clearCartBtn.addEventListener("click", clearCart);
