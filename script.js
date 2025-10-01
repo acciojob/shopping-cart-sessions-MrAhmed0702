@@ -12,28 +12,18 @@ const productList = document.getElementById("product-list");
 const cartList = document.getElementById("cart-list");
 const clearCartBtn = document.getElementById("clear-cart-btn");
 
-// Helper: Get cart from sessionStorage
-function getCartFromStorage() {
-  const cart = sessionStorage.getItem("cart");
-  return cart ? JSON.parse(cart) : [];
-}
-
-// Helper: Save cart to sessionStorage
-function saveCartToStorage(cart) {
-  sessionStorage.setItem("cart", JSON.stringify(cart));
-}
-
 // Render product list
 function renderProducts() {
+  productList.innerHTML = ""; // Clear before rendering
   products.forEach((product) => {
     const li = document.createElement("li");
-    li.innerHTML = `
-      ${product.name} - $${product.price} 
-      <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>`;
+    li.innerHTML = `${product.name} - $${product.price} <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>`;
     productList.appendChild(li);
   });
+  setupCartButtons(); // Setup buttons AFTER rendering
+}
 
-  // Add event listeners after rendering buttons
+function setupCartButtons() {
   const addToCartButtons = document.querySelectorAll(".add-to-cart-btn");
   addToCartButtons.forEach((button) => {
     button.addEventListener("click", () => {
@@ -43,14 +33,25 @@ function renderProducts() {
   });
 }
 
-// Render cart list from sessionStorage
+// Render cart list
 function renderCart() {
-  cartList.innerHTML = ""; // Clear current cart display
-  const cart = getCartFromStorage();
+  const cart = sessionStorage.getItem("cart");
+  if (!cart) return;
 
-  cart.forEach((item) => {
+  const cartItems = JSON.parse(cart);
+  cartList.innerHTML = "";
+
+  cartItems.forEach((item) => {
     const li = document.createElement("li");
     li.textContent = `${item.name} - $${item.price}`;
+
+    const removeBtn = document.createElement("button");
+    removeBtn.textContent = "Remove";
+    removeBtn.addEventListener("click", () => {
+      removeFromCart(item.id);
+    });
+
+    li.appendChild(removeBtn);
     cartList.appendChild(li);
   });
 }
@@ -60,21 +61,36 @@ function addToCart(productId) {
   const product = products.find((p) => p.id === productId);
   if (!product) return;
 
-  const cart = getCartFromStorage();
-  cart.push(product);
-  saveCartToStorage(cart);
+  const cartItems = sessionStorage.getItem("cart");
+  const cartArray = cartItems ? JSON.parse(cartItems) : [];
+  cartArray.push(product);
+
+  sessionStorage.setItem("cart", JSON.stringify(cartArray));
+  renderCart();
+}
+
+// Remove item from cart
+function removeFromCart(productId) {
+  const cart = sessionStorage.getItem("cart");
+  const items = JSON.parse(cart);
+
+  const index = items.findIndex((item) => item.id === productId);
+  if (index !== -1) {
+    items.splice(index, 1);
+    sessionStorage.setItem("cart", JSON.stringify(items));
+  }
+
   renderCart();
 }
 
 // Clear cart
 function clearCart() {
   sessionStorage.removeItem("cart");
+  cartList.innerHTML = "";
   renderCart();
 }
 
 // Initial render
 renderProducts();
 renderCart();
-
-// Clear cart button listener
 clearCartBtn.addEventListener("click", clearCart);
