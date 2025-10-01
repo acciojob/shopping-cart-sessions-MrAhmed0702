@@ -96,4 +96,4 @@ function clearCart() {
 renderProducts();
 renderCart();
 
-//
+clearCartBtn.addEventListener("click", clearCart);
